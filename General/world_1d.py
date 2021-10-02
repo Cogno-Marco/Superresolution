@@ -11,20 +11,24 @@ class World_1d:
     def __str__(self) -> str:
         return "W: " + self._world.__str__()
     
-    def getWorld(self):
+    def get_world(self):
         return self._world
         
     def count_whites(self, ind: int, r: int = 2) -> int:
         """Returns how many white micropixels there are in range [ind, ind+r]. Defaults to r=2"""
         return sum(self._world[ind:ind+r])
     
-    def getPixelColorValue(self, ind: int, r: int = 2) -> float:
+    def get_pixel_color_value(self, ind: int, r: int = 2) -> float:
         """Returns the scaled color of a macropixel with position [ind, ind+r]. Defaults to r=2"""
         return self.count_whites(ind, r) / r
     
     def get_world_macros(self, offset: int, r: int = 2) -> List[float]:
         """Returns the value of each p"""
-        return [self.getPixelColorValue(i + offset, r) for i in range(0, len(self._world), r)]
+        return [self.get_pixel_color_value(i + offset, r) for i in range(0, len(self._world), r)]
+    
+    def get_world_whites_count(self, offset: int, r: int = 2) -> List[int]:
+        """Returns the number of each white micropixels in each world macropixel from offset f"""
+        return [self.count_whites(i + offset, r) for i in range(0, len(self._world), r)]
     
     def take_photo(self, ind: int, k: int = 1_000, r:int = 2) -> Photo_1d:
         """

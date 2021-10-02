@@ -2,6 +2,8 @@ from general.world_1d import World_1d
 from general.photo_1d import Photo_1d
 import matplotlib.pyplot as plt
 import numpy as np
+from typing import List
+import math
 
 # registration algorithm:
 # compare each macropixel of a photo with a macropixel of the world at an offset
@@ -16,22 +18,22 @@ import numpy as np
 # TODO: probability is *really* small, better work with ints than with floats
 
 # world setup
-k = 100
-r = 4
-f = 0
-world = World_1d(2 * k * r)
+k: int = 100
+r: int = 8
+f: int = 0
+world: World_1d = World_1d(2 * k * r)
 
 # take a photo
-photo = world.take_photo(f, k, r)
-print(world)
-print(photo)
+photo: Photo_1d = world.take_photo(f, k, r)
+# print(world)
+# print(photo)
 
 # calculate the product probability
-probabilities = []
-for i in range(0, r+1):
-    probability = 1
+probabilities : List[int] = []
+for i in range(0, r + 1):
+    probability: int = 1
     for p, mu in zip(world.get_world_macros(i, r), photo.get_macros()):
-        probability *= p if mu == 1 else (1-p)
+        probability *= (2 * p) if mu == 1 else ((1 - p) * 2)
     probabilities.append(probability)
 
 print(probabilities)
