@@ -9,7 +9,10 @@ class World_1d:
         self._world: List[int] = [rng.randint(0,1) for i in range(size)]
     
     def __str__(self) -> str:
-        return "W: " + self._world.__str__()
+        return self._world.__str__()
+    
+    def __repr__(self) -> str:
+        return self.__str__()
     
     def get_world(self):
         return self._world

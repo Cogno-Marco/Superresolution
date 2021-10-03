@@ -1,9 +1,8 @@
 from general.world_1d import World_1d
 from general.photo_1d import Photo_1d
 import matplotlib.pyplot as plt
-import numpy as np
 from typing import List
-import math
+import random
 
 # registration algorithm:
 # compare each macropixel of a photo with a macropixel of the world at an offset
@@ -15,44 +14,63 @@ import math
 # 1. probability at the offset where the photo was taken > probability at other offsets
 # 2. as k increases we're less likely to guess a wrong offset compared to the one where the photo was actually taken
 
-# TODO: probability is *really* small, better work with ints than with floats
+
+def calculate_probability(offset: int) -> int:
+    # TODO: probability is *really* small, better work with ints than with floats
+    probability: int = 1
+    for n, mu in zip(world.get_world_whites_count(offset, r), photo.get_macros()):
+        probability *= (n) if mu == 1 else (r - n)
+    return probability
+    
+def guess_offset() -> int:
+    # calculate the product probability
+    # N.B. using float the probability gets squished to 0.0 due to the high amount of macropixels
+    # using bigints we can avoid the problem, so instead of calculating the actual probability
+    # we only calculate the numerator, since the denominator is always r^k which we can ignore
+    # since the argmax doesn't get affected
+    probabilities : List[int] = []
+    for i in range(0, r + 1):
+        probabilities.append(calculate_probability(i))
+
+    print(probabilities)
+
+    return probabilities.index(max(probabilities))
 
 # world setup
-k: int = 100
-r: int = 8
-f: int = 0
-world: World_1d = World_1d(2 * k * r)
+k: int = 10
+r: int = 2
+trials: int = 100
 
-# take a photo
-photo: Photo_1d = world.take_photo(f, k, r)
-# print(world)
-# print(photo)
+guesses: List[int] = [0] * (r+1) # record wrong guesses ad relative offset distance
+for _ in range(trials):
+    f: int = random.randint(0, r)
+    world: World_1d = World_1d(2 * k * r)
 
-# calculate the product probability
-probabilities : List[int] = []
-for i in range(0, r + 1):
-    probability: int = 1
-    for p, mu in zip(world.get_world_macros(i, r), photo.get_macros()):
-        probability *= (2 * p) if mu == 1 else ((1 - p) * 2)
-    probabilities.append(probability)
+    # take a photo
+    photo: Photo_1d = world.take_photo(f, k, r)
+    # print(f"{world=}")
+    # print(f"{photo=}")
 
-print(probabilities)
+    guess = guess_offset()
+    guesses[photo.offset - guess] += 1
 
-guess = probabilities.index(max(probabilities))
-print(f"guessed position: {guess} actual offset: {photo.offset}")
+    # print(f"guessed position: {guess} actual offset: {photo.offset}")
 
-# Data for plotting
-t = [i for i in range(r+1)]
-s = probabilities
+print(f"{guesses=}")
 
-fig, ax = plt.subplots()
-ax.plot(t, s)
 
-ax.set(xlabel='offsets (f)', ylabel='probability (p)',
-       title='Probability check of a single photo')
-ax.grid()
+# # Data for plotting
+# t = [i for i in range(r+1)]
+# s = probabilities
 
-plt.ylim(bottom=0)
+# fig, ax = plt.subplots()
+# ax.plot(t, s)
 
-# fig.savefig("test.png")
-plt.show()
+# ax.set(xlabel='offsets (f)', ylabel='probability (p)',
+#        title='Probability check of a single photo')
+# ax.grid()
+
+# plt.ylim(bottom=0)
+
+# # fig.savefig("test.png")
+# plt.show()
