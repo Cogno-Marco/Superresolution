@@ -17,7 +17,7 @@ import random
 
 
 def calculate_probability(world: World_1d, photo: Photo_1d, offset: int) -> int:
-    # TODO: probability is *really* small, better work with ints than with floats
+    # N.B. probability is *really* small, better work with bigints than with floats to avoid cumulative errors
     probability: int = 1
     for n, mu in zip(world.get_world_whites_count(offset, r), photo.get_macros()):
         probability *= (n) if mu == 1 else (r - n)
@@ -29,10 +29,7 @@ def guess_offset(world: World_1d, photo: Photo_1d) -> int:
     # using bigints we can avoid the problem, so instead of calculating the actual probability
     # we only calculate the numerator, since the denominator is always r^k which we can ignore
     # since the argmax doesn't get affected
-    probabilities : List[int] = []
-    for i in range(0, r + 1):
-        probabilities.append(calculate_probability(world, photo, i))
-
+    probabilities : List[int] = [calculate_probability(world, photo, i) for i in range(0, r + 1)]
     # print(f"{probabilities=}")
 
     return probabilities.index(max(probabilities))
@@ -65,11 +62,11 @@ def test_guessing_probability(k: int, r: int = 2, trials: int = 100) -> List[int
 # we expect to see this value increase as k increases
 
 # world setup
-r: int = 8
+r: int = 2
 trials: int = 1000
 min_k = 1
-max_k = 400
-k_step = 4
+max_k = 40
+k_step = 1
 
 probability_as_k_increases: List[float] = [0] * int(((max_k + 1) - min_k) / k_step)
 k_to_test = range(min_k, max_k + 1, k_step)
