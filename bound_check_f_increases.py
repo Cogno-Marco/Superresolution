@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from typing import List
 import random
+import math
 
 # registration algorithm:
 # compare each macropixel of a photo with a macropixel of the world at an offset
@@ -62,11 +63,11 @@ def test_guessing_probability(k: int, r: int = 2, trials: int = 100) -> List[int
 # we expect to see this value increase as k increases
 
 # world setup
-r: int = 2
+r: int = 8
 trials: int = 1000
 min_k = 1
-max_k = 40
-k_step = 1
+max_k = 880
+k_step = 80
 
 probability_as_k_increases: List[float] = [0] * int(((max_k + 1) - min_k) / k_step)
 k_to_test = range(min_k, max_k + 1, k_step)
@@ -81,13 +82,16 @@ for i, k in enumerate(k_to_test):
 
 print(f"{probability_as_k_increases=}")
 
+expected_bound = [1 - math.exp(- k / (2 * r * (r + 1))) for k in k_to_test]
+
 fig, ax = plt.subplots()
 ax.plot(k_to_test, probability_as_k_increases)
+ax.plot(k_to_test, expected_bound, '--')
 
 ax.set(xlabel=f'camera size (k)', ylabel='probability (p)',
        title=f'Probability to guess correctly photos offset as k increases (r={r})')
 ax.grid()
 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-plt.ylim(bottom=0)
+plt.ylim(bottom=0, top=1)
 plt.xlim(left=min_k, right=max_k)
 plt.show()
