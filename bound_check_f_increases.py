@@ -6,6 +6,9 @@ from typing import List
 import random
 import math
 
+import cProfile
+import pstats
+
 # registration algorithm:
 # compare each macropixel of a photo with a macropixel of the world at an offset
 # compute the product of all macropixels values (p if white, 1-p if black)
@@ -71,14 +74,18 @@ k_step = 80
 
 probability_as_k_increases: List[float] = [0] * int(((max_k + 1) - min_k) / k_step)
 k_to_test = range(min_k, max_k + 1, k_step)
-for i, k in enumerate(k_to_test):
-    
-    percentage = round(i / len(k_to_test) * 100,2)
-    print(f"Current k: {k}, {percentage}%             ", end="\r")
-    guesses = test_guessing_probability(k, r, trials)
-    # print(f"{guesses=}")
-    probability_as_k_increases[i] = guesses[0] / trials
+with cProfile.Profile() as pr:
+    for i, k in enumerate(k_to_test):
+        
+        percentage = round(i / len(k_to_test) * 100,2)
+        print(f"Current k: {k}, {percentage}%             ", end="\r")
+        guesses = test_guessing_probability(k, r, trials)
+        # print(f"{guesses=}")
+        probability_as_k_increases[i] = guesses[0] / trials
 
+stats = pstats.Stats(pr)
+stats.sort_stats(pstats.SortKey.TIME)
+stats.dump_stats(filename='profiling_np_arr.prof')
 
 print(f"{probability_as_k_increases=}")
 

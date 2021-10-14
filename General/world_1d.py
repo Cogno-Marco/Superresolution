@@ -1,12 +1,14 @@
 import random as rng
 from typing import List
 from general.photo_1d import Photo_1d
+import numpy as np
 
 class World_1d:
     
     def __init__(self, size: int = 10_000):
         """Generates and returns a new world with a given size (defaults to a size of 10_000)"""
-        self._world: List[int] = [rng.randint(0,1) for i in range(size)]
+        # self._world: List[int] = [rng.randint(0,1) for i in range(size)]
+        self._world: List[int] = np.random.randint(2, size=size).tolist()
     
     def __str__(self) -> str:
         return self._world.__str__()
